@@ -24,22 +24,45 @@ export function ContactSection() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      const response = await fetch('/api/appointments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
 
-    toast({
-      title: 'Appointment Request Sent!',
-      description: "We'll confirm your appointment shortly via phone or WhatsApp.",
-    });
+      if (response.ok) {
+        toast({
+          title: 'Appointment Request Sent!',
+          description: "We'll confirm your appointment shortly via phone or WhatsApp.",
+        });
 
-    setFormData({
-      name: '',
-      phone: '',
-      email: '',
-      preferredTime: '',
-      message: '',
-    });
-    setIsSubmitting(false);
+        setFormData({
+          name: '',
+          phone: '',
+          email: '',
+          preferredTime: '',
+          message: '',
+        });
+      } else {
+        toast({
+          title: 'Error',
+          description: 'Failed to send appointment request. Please try again.',
+          variant: 'destructive',
+        });
+      }
+    } catch (error) {
+      console.error('Submission error:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to send appointment request. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (
@@ -167,7 +190,7 @@ export function ContactSection() {
                       htmlFor="email"
                       className="block text-sm font-medium text-foreground mb-2"
                     >
-                      Email
+                      Email *
                     </label>
                     <Input
                       id="email"
@@ -176,6 +199,7 @@ export function ContactSection() {
                       value={formData.email}
                       onChange={handleChange}
                       placeholder="your@email.com"
+                      required
                       className="h-12"
                     />
                   </div>
@@ -186,7 +210,7 @@ export function ContactSection() {
                     htmlFor="preferredTime"
                     className="block text-sm font-medium text-foreground mb-2"
                   >
-                    Preferred Date/Time
+                    Preferred Date/Time *
                   </label>
                   <Input
                     id="preferredTime"
@@ -194,6 +218,7 @@ export function ContactSection() {
                     value={formData.preferredTime}
                     onChange={handleChange}
                     placeholder="e.g., Monday 4 PM, or any weekday morning"
+                    required
                     className="h-12"
                   />
                 </div>
